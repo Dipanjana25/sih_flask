@@ -1,0 +1,121 @@
+body {
+    /* background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); */
+    background: linear-gradient(-45deg, #FF0080, #0080FF,#9ca3af);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+  }
+
+  @keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+  .height {
+
+    height: 80vh;
+  }
+
+  .form {
+
+    position: relative;
+  }
+
+  .form .fa-search {
+
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #9ca3af;
+
+  }
+
+  .form span {
+
+    position: absolute;
+    right: 17px;
+    top: 13px;
+    padding: 2px;
+    border-left: 1px solid #d1d5db;
+
+  }
+
+  .left-pan {
+    padding-left: 7px;
+  }
+
+  .left-pan i {
+
+    padding-left: 10px;
+  }
+
+  .form-input {
+
+    height: 55px;
+    text-indent: 33px;
+    border-radius: 10px;
+  }
+
+  .form-input:focus {
+
+    box-shadow: none;
+    border: none;
+  }
+ 
+  button{
+    display: block;
+    float: right;
+    
+  }
+
+  .row2{
+    height: 100%;
+    display: block;
+  }
+  .column1 {
+    padding: 10px;
+    float: left;
+    width: 25%;
+    height: 10pc;
+
+  }
+
+  .button{
+    align-items: center;
+  }
+
+  .title a{
+    margin-top: 20px;
+    color: #ffffff;
+    margin-left: 20px;
+    font-family: 'Kaushan Script', serif;
+    font-size: 30px;
+    text-shadow: 4px 4px 4px rgb(255, 4, 155);
+    display: flex;
+  }
+  h1{
+    color: aqua;
+  }
+
+  .card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #f771b4, #6fb6fd);
+    background-size: 400% 400%;
+    animation: gradient 1s ease infinite;
+  }
+  
+  /* On mouse-over, add a deeper shadow */
+  .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }
