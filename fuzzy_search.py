@@ -13,15 +13,15 @@ API_KEY = "EjhSxeGpKbt7vT85tbcLhqWoPXJegTi44PUmY6lT"
 co_client = cohere.Client(API_KEY)
 
 df=pd.read_csv("data-set/cities_r2.csv")
-df=df["ascii_name"]
+df=df["city"]
 df=df.drop_duplicates()
 df=df.dropna()
-df=df.to_frame(name="ascii_name")
+df=df.to_frame(name="city")
 
 
 
 embeds = co_client.embed(
-    texts=list(df['ascii_name']),
+    texts=list(df['city']),
     model='large',
     truncate='RIGHT'
 ).embeddings
@@ -53,7 +53,7 @@ def closest(query):
 
     results = pd.DataFrame(
         data={
-            'texts': df.iloc[similar_item_ids[0]]['ascii_name'],
+            'texts': df.iloc[similar_item_ids[0]]['city'],
             'distance': similar_item_ids[1],
         }
     )

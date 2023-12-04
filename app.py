@@ -5,7 +5,6 @@ app = Flask(__name__)
 import flair_token
 import fuzzy_search
 
-results = []
 
 @app.route('/', methods = ['POST','GET'])
 def home():
@@ -13,6 +12,7 @@ def home():
         sentence = request.form['query']
         try:
             token  = flair_token.handle_click(sentence)
+            results = []
             for i in token:
                 results.append(fuzzy_search.closest(i))
 
