@@ -3,7 +3,9 @@ from flask import Flask,render_template,request
 app = Flask(__name__)
 
 import flair_token
-# import fuzzy_search
+import fuzzy_search
+
+results = []
 
 @app.route('/', methods = ['POST','GET'])
 def home():
@@ -11,7 +13,11 @@ def home():
         sentence = request.form['query']
         try:
             token  = flair_token.handle_click(sentence)
-            return render_template('base.html',tokens=token)
+            for i in token:
+                results.append(fuzzy_search.closest(i))
+
+            print(results)
+            return render_template('base.html',tokens=results)
         except:
             return render_template('base.html')
     else:
