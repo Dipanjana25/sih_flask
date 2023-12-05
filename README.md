@@ -14,3 +14,5 @@ flask --app app run
 ```
 > Visit the browser on link given and search query
 
+> # Important:
+* Add venv (virtual environment) file to .gitignore file

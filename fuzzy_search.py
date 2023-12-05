@@ -42,6 +42,7 @@ EXAMPLE_ID = 69  # Nice
 NUM_NEIGHBORS = 10
 
 def closest(query):
+    # print("Query is : ",query)
     QUERY = query 
     query_embed = co_client.embed(
         texts = [QUERY],
@@ -57,15 +58,15 @@ def closest(query):
             'distance': similar_item_ids[1],
         }
     )
-    print(f"The Question is : {QUERY}")
-    print('The nearest neighbors are : ')
-    print(results)
+    # print(f"The Question is : {QUERY}")
+    # print('The nearest neighbors are : ')
+    # print(results)
 
     final=[]
     for word in results["texts"]:
         final.append([(fuzz.ratio(QUERY,word)+fuzz.partial_ratio(QUERY,word))/2,word])
     final.sort(reverse=True)
-    print(final)
+    # print(final)
     return final
 
 

@@ -1,10 +1,11 @@
 from flask import Flask,render_template,request
-
+import json
 app = Flask(__name__)
 
 import flair_token
 import fuzzy_search
-
+tokenjson = "output/token.json"
+resultsjson = "output/results.json"
 
 @app.route('/', methods = ['POST','GET'])
 def home():
@@ -12,12 +13,22 @@ def home():
         sentence = request.form['query']
         try:
             token  = flair_token.handle_click(sentence)
+
+            with open(tokenjson, 'w') as json_file:
+                json.dump(token, json_file)
+            
             results = []
             for i in token:
                 results.append(fuzzy_search.closest(i))
+            
+            # print(results)
+            with open(resultsjson, 'w') as json_file:
+                json.dump(results, json_file)
 
-            print(results)
-            return render_template('base.html',tokens=results)
+            token_json = json.dumps(token)
+
+            results_json = json.dumps(results)
+            return render_template('base.html',token=token_json,results=results_json)
         except:
             return render_template('base.html')
     else:

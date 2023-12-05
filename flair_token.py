@@ -17,7 +17,8 @@ def handle_click(sentence_rec):
     ner_dict = sentence.to_dict(tag_type='ner')
     ner_df = pd.DataFrame(ner_dict['entities'])
     text = ner_df['text'].values
-    return text
+    python_list =text.tolist()
+    return python_list
 
 
 if __name__ == "__main__":
