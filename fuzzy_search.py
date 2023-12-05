@@ -1,12 +1,7 @@
-import re
-import umap
 import cohere
 import numpy as np
 import pandas as pd
-import altair as alt
 from annoy import AnnoyIndex
-from datasets import load_dataset
-from sklearn.metrics.pairwise import cosine_similarity
 from rapidfuzz import fuzz
 
 API_KEY = "EjhSxeGpKbt7vT85tbcLhqWoPXJegTi44PUmY6lT"
@@ -82,7 +77,7 @@ def closest(query):
 
 
 
-# from pyphonetics import RefinedSoundex
+from pyphonetics import RefinedSoundex
 # rs = RefinedSoundex()
 # final=[]
 # for word in results["texts"]:
