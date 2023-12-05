@@ -4,7 +4,7 @@ from flair.data import Sentence
 from flair.models import SequenceTagger
 
 def load_flair_model():
-    classifier = SequenceTagger.load('ner-large')
+    classifier = SequenceTagger.load('ner-fast')
     return classifier
 
 classifier = load_flair_model()
@@ -18,7 +18,8 @@ def handle_click(sentence_rec):
     ner_df = pd.DataFrame(ner_dict['entities'])
     text = ner_df['text'].values
     python_list =text.tolist()
-    return python_list
+
+    return processed_string
 
 
 if __name__ == "__main__":

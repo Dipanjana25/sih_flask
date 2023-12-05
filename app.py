@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,jsonify
 import json
 app = Flask(__name__)
 
@@ -13,6 +13,7 @@ def home():
         sentence = request.form['query']
         try:
             token  = flair_token.handle_click(sentence)
+            print(token)
 
             with open(tokenjson, 'w') as json_file:
                 json.dump(token, json_file)
@@ -28,7 +29,8 @@ def home():
             token_json = json.dumps(token)
 
             results_json = json.dumps(results)
-            return render_template('base.html',token=token_json,results=results_json)
+            # return render_template('base.html',token=token_json,results=results_json)
+            return jsonify(token)
         except:
             return render_template('base.html')
     else:
