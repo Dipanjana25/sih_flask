@@ -4,7 +4,7 @@ from flair.data import Sentence
 from flair.models import SequenceTagger
 
 def load_classifier_model():
-    classifier = SequenceTagger.load('ner-fast')
+    classifier = SequenceTagger.load('ner-large')
     return classifier
 
 def load_tagger_model():
