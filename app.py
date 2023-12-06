@@ -1,42 +1,31 @@
-from flask import Flask,render_template,request,jsonify
-import json
-app = Flask(__name__)
+from flask import Flask, request, abort, jsonify
 
 import flair_token
 import fuzzy_search
+
+app = Flask(__name__)
 tokenjson = "output/token.json"
 resultsjson = "output/results.json"
 
-@app.route('/', methods = ['POST','GET'])
-def home():
-    if request.method =="POST":
-        sentence = request.form['query']
-        try:
-            token  = flair_token.handle_click(sentence)
-            print(token)
+@app.route('/api/processquery', methods=['POST'])
+async def processquery():
+    if not request.json or not 'query' in request.json:
+        abort(400)
+    query=request.json['query']
 
-            with open(tokenjson, 'w') as json_file:
-                json.dump(token, json_file)
-            
-            results = []
-            for i in token:
-                results.append(fuzzy_search.closest(i))
-            
-            # print(results)
-            with open(resultsjson, 'w') as json_file:
-                json.dump(results, json_file)
-
-            token_json = json.dumps(token)
-
-            results_json = json.dumps(results)
-            # return render_template('base.html',token=token_json,results=results_json)
-            return jsonify(token)
-        except:
-            return render_template('base.html')
-    else:
-        return render_template('base.html')
- 
-
+    loc=await flair_token.tokenise_loc(query)
+    possible_loc_tokens=await flair_token.get_possible_loc_tokens(query)
+    
+    mp={}
+    for token in possible_loc_tokens:
+            mp[token[0]]=[]
+            mp[token[0]]=await fuzzy_search.closest(token[0])
+    
+    return jsonify({
+        'flair_loc_tokens': loc,
+        'possible_loc_tokens': possible_loc_tokens,
+        'fuzzy_sdx': mp,
+    })
 
 if __name__== "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="127.0.0.1", port=5000)

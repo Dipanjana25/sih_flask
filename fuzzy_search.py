@@ -2,86 +2,59 @@ import cohere
 import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
+from flair.embeddings import TransformerWordEmbeddings
+from flair.data import Sentence
 from rapidfuzz import fuzz
+from pyphonetics import RefinedSoundex
 
-API_KEY = "EjhSxeGpKbt7vT85tbcLhqWoPXJegTi44PUmY6lT"
-co_client = cohere.Client(API_KEY)
-
-df=pd.read_csv("data-set/cities_r2.csv")
-df=df["city"]
+df=pd.read_csv("data-set/indian_cities_database.csv")
+df=df["ascii_name"]
 df=df.drop_duplicates()
 df=df.dropna()
-df=df.to_frame(name="city")
+df=df.to_frame(name="ascii_name")
+df1=df
+
+# USE roberta-base-cased for final deployed model
+glove_embedding = TransformerWordEmbeddings('bert-base-cased')
+
+INDEX_SHAPE = 768
+NUM_NEIGHBORS = 100
+NUM_FINAL = 3
+
+search_index = AnnoyIndex(INDEX_SHAPE, 'angular')
+search_index.load('model.ann')
 
 
-
-embeds = co_client.embed(
-    texts=list(df['city']),
-    model='large',
-    truncate='RIGHT'
-).embeddings
-
-embeds = np.array(embeds)
-
-
-search_index = AnnoyIndex(embeds.shape[1], 'angular')
-for i in range(len(embeds)):
-    search_index.add_item(i, embeds[i])
-
-search_index.build(10)
-search_index.save('test.ann')
-
-
-
-EXAMPLE_ID = 69  # Nice
-NUM_NEIGHBORS = 10
-
-def closest(query):
-    # print("Query is : ",query)
+async def closest(query):
     QUERY = query 
-    query_embed = co_client.embed(
-        texts = [QUERY],
-        model = 'large',
-        truncate='RIGHT'
-    ).embeddings
+    tmp=[Sentence(str(QUERY))]
+    # embed a sentence using glove.
+    glove_embedding.embed(tmp)
+    tmp[0][0].embedding
 
-    similar_item_ids = search_index.get_nns_by_vector(query_embed[0], NUM_NEIGHBORS, include_distances=True)
+    similar_item_ids = search_index.get_nns_by_vector(tmp[0][0].embedding.cpu().numpy(), NUM_NEIGHBORS, include_distances=True)
 
     results = pd.DataFrame(
         data={
-            'texts': df.iloc[similar_item_ids[0]]['city'],
+            'texts': df1.iloc[similar_item_ids[0]]['ascii_name'],
             'distance': similar_item_ids[1],
         }
     )
-    # print(f"The Question is : {QUERY}")
-    # print('The nearest neighbors are : ')
-    # print(results)
+    annoy=results["texts"].tolist()
+    
+    # universe=list(df["city"])
+    universe=results["texts"].tolist()
+    fuzzy=[]
+    for word in universe:
+        fuzzy.append([(fuzz.ratio(QUERY,word)+fuzz.partial_ratio(QUERY,word))/2,word])
+    fuzzy.sort(reverse=True)
+    fuzzy=fuzzy[:NUM_FINAL]
 
-    final=[]
-    for word in results["texts"]:
-        final.append([(fuzz.ratio(QUERY,word)+fuzz.partial_ratio(QUERY,word))/2,word])
-    final.sort(reverse=True)
-    # print(final)
-    return final
+    rs = RefinedSoundex()
+    sdx=[]
+    for word in universe:
+        sdx.append([rs.distance(QUERY,word),word])
+    sdx.sort()
+    sdx=sdx[:NUM_FINAL]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-from pyphonetics import RefinedSoundex
-# rs = RefinedSoundex()
-# final=[]
-# for word in results["texts"]:
-#     final.append([rs.distance(QUERY,word),word])
-# final.sort()
-# print(final)
-
+    return [fuzzy,sdx]
