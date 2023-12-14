@@ -1,0 +1,93 @@
+import pickle
+from collections import defaultdict
+from nltk import ngrams
+from fuzzywuzzy import process, fuzz
+
+# File path to store and load the trigram index
+INDEX_FILE_PATH = "data/trigram_index.pkl"
+TARGET_WORDS_FILE_PATH = "data/dataset.pkl"
+
+# Load the target words from the file
+try:
+    with open(TARGET_WORDS_FILE_PATH, "rb") as file:
+        target_words = pickle.load(file)
+except FileNotFoundError:
+    target_words = ["word1", "word2", "word3"]
+
+# Load the trigram index from the file if it exists
+try:
+    with open(INDEX_FILE_PATH, "rb") as file:
+        trigram_index = pickle.load(file)
+except FileNotFoundError:
+    trigram_index = defaultdict(list)
+
+def save_trigram_index():
+    # Save the trigram index to the file
+    with open(INDEX_FILE_PATH, "wb") as file:
+        pickle.dump(trigram_index, file)
+
+# Populate the initial trigram index if it's empty
+if not trigram_index:
+    for word in target_words:
+        trigrams = [''.join(gram) for gram in ngrams(word, 3)]
+        for trigram in trigrams:
+            trigram_index[trigram].append(word)
+    save_trigram_index()
+
+def save_target_words():
+    # Save the target words to the file
+    with open(TARGET_WORDS_FILE_PATH, "wb") as file:
+        pickle.dump(target_words, file)
+
+def phonetic_match(word1, word2, threshold=60):
+    # Use the ratio method from fuzz to calculate similarity
+    return fuzz.ratio(word1, word2) > threshold
+
+def fuzzy_search(search_term, threshold=60):
+    trigrams = [''.join(gram) for gram in ngrams(search_term, 3)]
+
+    # Get potential candidates from the trigram index
+    candidates = set()
+    for trigram in trigrams:
+        candidates.update(trigram_index.get(trigram, []))
+
+    # Perform a fuzzy search on potential candidates
+    results = process.extract(search_term, candidates, limit=5)
+
+    # Filter the results based on improved phonetic matching
+    phonetic_results = [(word, score) for word, score in results if phonetic_match(search_term, word, threshold)]
+    print(phonetic_results)
+    return phonetic_results
+
+# insert new words from array of words
+def insert(word):
+    trigrams = [''.join(gram) for gram in ngrams(word, 3)]
+    for trigram in trigrams:
+        trigram_index[trigram].append(word)
+
+    # Save the updated trigram index to the file
+    save_trigram_index()
+
+# replace word from old to new
+def update(old_word, new_word):
+    # Remove old spelling from the trigram index
+    trigrams_old = [''.join(gram) for gram in ngrams(old_word, 3)]
+    for trigram in trigrams_old:
+        trigram_index[trigram].remove(old_word)
+
+    # Add new spelling to the trigram index
+    trigrams_new = [''.join(gram) for gram in ngrams(new_word, 3)]
+    for trigram in trigrams_new:
+        trigram_index[trigram].append(new_word)
+
+    # Save the updated trigram index to the file
+    save_trigram_index()
+
+# delete a word
+def delete(word):
+    # Remove old spelling from the trigram index
+    trigrams_old = [''.join(gram) for gram in ngrams(word, 3)]
+    for trigram in trigrams_old:
+        trigram_index[trigram].remove(word)
+
+    save_trigram_index()

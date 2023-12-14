@@ -1,4 +1,3 @@
-import cohere
 import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
@@ -7,11 +6,12 @@ from flair.data import Sentence
 from rapidfuzz import fuzz
 from pyphonetics import RefinedSoundex
 
-df=pd.read_csv("data-set/indian_cities_database.csv")
-df=df["ascii_name"]
+df=pd.read_csv("data-set/cities_r2.csv")
+df["city"]=df["city"].str.lower()
+df=df["city"]
 df=df.drop_duplicates()
 df=df.dropna()
-df=df.to_frame(name="ascii_name")
+df=df.to_frame(name="city")
 df1=df
 
 # USE roberta-base-cased for final deployed model
@@ -36,7 +36,7 @@ async def closest(query):
 
     results = pd.DataFrame(
         data={
-            'texts': df1.iloc[similar_item_ids[0]]['ascii_name'],
+            'texts': df1.iloc[similar_item_ids[0]]['city'],
             'distance': similar_item_ids[1],
         }
     )

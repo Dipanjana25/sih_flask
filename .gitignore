@@ -8,3 +8,10 @@ __pycache__/*
 .ipynb_checkpoints/*
 test.ann
 closestsearch.ipynb
+dataset_gen.py
+locustfile.py
+*.ann
+*.rest
+train_annpy.py
+visualisations.py
+data/xlr-tuned.pt
