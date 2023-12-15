@@ -12,7 +12,7 @@ try:
     with open(TARGET_WORDS_FILE_PATH, "rb") as file:
         target_words = pickle.load(file)
 except FileNotFoundError:
-    target_words = ["word1", "word2", "word3"]
+    target_words = []
 
 # Load the trigram index from the file if it exists
 try:
@@ -73,7 +73,8 @@ def update(old_word, new_word):
     # Remove old spelling from the trigram index
     trigrams_old = [''.join(gram) for gram in ngrams(old_word, 3)]
     for trigram in trigrams_old:
-        trigram_index[trigram].remove(old_word)
+        if old_word in trigram_index[trigram]:
+            trigram_index[trigram].remove(old_word)
 
     # Add new spelling to the trigram index
     trigrams_new = [''.join(gram) for gram in ngrams(new_word, 3)]
@@ -88,6 +89,7 @@ def delete(word):
     # Remove old spelling from the trigram index
     trigrams_old = [''.join(gram) for gram in ngrams(word, 3)]
     for trigram in trigrams_old:
-        trigram_index[trigram].remove(word)
+        if word in trigram_index[trigram]:
+            trigram_index[trigram].remove(word)
 
     save_trigram_index()

@@ -6,7 +6,7 @@ flair.device="cpu"
 torch.device("cpu")
 
 def load_classifier_model():
-    classifier = SequenceTagger.load('data/final-model.pt')
+    classifier = SequenceTagger.load('data/xlr-tuned.pt')
     # classifier = SequenceTagger.load('ner')
     return classifier
 

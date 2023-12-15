@@ -18,8 +18,8 @@ def processquery():
         mp[str(token[0])]=ngram_fuzzy_search.fuzzy_search(token[0], 60)
     print(mp)
     return jsonify({
-        'flair_loc_tokens': locs,
-        'fuzzy': mp,
+        'loc_tokens': locs,
+        'fuzzy_matches': mp,
     })
 
 @app.route('/api/ngindex', methods=['POST', 'PUT', 'DELETE'])
@@ -37,22 +37,27 @@ def update():
             return jsonify({"status": "not success"}), 400
 
     elif request.method=='PUT':
-        if 'old_loc' or 'new_loc' not in request.json:
+        if 'old_loc' not in request.json:
+            abort(400)
+        elif 'new_loc' not in request.json:
             abort(400)
         try:
-            ngram_fuzzy_search.update(request.json['old_loc'], request.json('new_loc'))
+            ngram_fuzzy_search.update(request.json['old_loc'], request.json['new_loc'])
             return jsonify({"status": "success"}), 200
         except:
             return jsonify({"status": "not success"}), 400
     
     elif request.method=='DELETE':
-        if not 'loc' in request.json:
+        if 'loc' not in request.json:
             abort(400)
         try:
             ngram_fuzzy_search.delete(request.json['locs'])
             return jsonify({"status": "success"}), 200
         except:
             return jsonify({"status": "not success"}), 400
+
+    return jsonify({"status": "invalid method"})
+
 
 if __name__== "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
