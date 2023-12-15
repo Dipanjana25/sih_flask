@@ -15,3 +15,5 @@ locustfile.py
 train_annpy.py
 visualisations.py
 data/xlr-tuned.pt
+data-set
+data-set/*
