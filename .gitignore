@@ -17,3 +17,5 @@ visualisations.py
 data/xlr-tuned.pt
 data-set
 data-set/*
+data/
+data/*
