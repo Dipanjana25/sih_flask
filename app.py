@@ -11,16 +11,22 @@ def processquery():
         abort(400)
     query=request.json['query']
 
-    locs=flair_token.tokenise_loc(query)
-    locs=[i for i in locs if i[1]=='LOC']
-    print(locs)
-    mp=defaultdict(list)
-    for token in locs:
-        mp[str(token[0])]=ngram_fuzzy_search.fuzzy_search(token[0], 60)
-    print(mp)
+    locs1=flair_token.tokenise_loc(query)
+    locs2=flair_token.tokenise_loc_2(query)
+    # locs1=[i for i in locs1 if i[1]=='LOC']
+    # print(locs)
+    mp1=defaultdict(list)
+    mp2=defaultdict(list)
+    for token in locs1:
+        mp1[str(token[0])]=ngram_fuzzy_search.fuzzy_search(token[0], 60)
+    for token in locs2:
+        mp2[str(token[0])]=ngram_fuzzy_search.fuzzy_search(token[0], 60)
+    # print(mp)
     return jsonify({
-        'loc_tokens': locs,
-        'fuzzy_matches': mp,
+        'model_1_loc': locs1,
+        'model_2_loc': locs2,
+        'fuzzy_matches_1': mp1,
+        'fuzzy_matches_2': mp2
     })
 
 @app.route('/api/ngindex', methods=['POST', 'PUT', 'DELETE'])
@@ -52,7 +58,7 @@ def update():
         if 'loc' not in request.json:
             abort(400)
         try:
-            ngram_fuzzy_search.delete(request.json['locs'])
+            ngram_fuzzy_search.delete(request.json['loc'])
             return jsonify({"status": "success"}), 200
         except:
             return jsonify({"status": "not success"}), 400
