@@ -12,6 +12,7 @@ def processquery():
     query=request.json['query']
 
     locs=flair_token.tokenise_loc(query)
+    locs=[i for i in locs if i[1]=='LOC']
     print(locs)
     mp=defaultdict(list)
     for token in locs:

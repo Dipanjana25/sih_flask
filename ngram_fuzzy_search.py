@@ -29,7 +29,7 @@ def save_trigram_index():
 # Populate the initial trigram index if it's empty
 if not trigram_index:
     for word in target_words:
-        trigrams = [''.join(gram) for gram in ngrams(word, 3)]
+        trigrams = [''.join(gram) for gram in ngrams(word, 2)]
         for trigram in trigrams:
             trigram_index[trigram].append(word)
     save_trigram_index()
@@ -44,7 +44,8 @@ def phonetic_match(word1, word2, threshold=60):
     return fuzz.ratio(word1, word2) > threshold
 
 def fuzzy_search(search_term, threshold=60):
-    trigrams = [''.join(gram) for gram in ngrams(search_term, 3)]
+    search_term = ''.join(filter(str.isalpha, search_term)).lower()
+    trigrams = [''.join(gram) for gram in ngrams(search_term, 2)]
 
     # Get potential candidates from the trigram index
     candidates = set()
@@ -61,7 +62,8 @@ def fuzzy_search(search_term, threshold=60):
 
 # insert new words from array of words
 def insert(word):
-    trigrams = [''.join(gram) for gram in ngrams(word, 3)]
+    word = ''.join(filter(str.isalpha, word)).lower()
+    trigrams = [''.join(gram) for gram in ngrams(word, 2)]
     for trigram in trigrams:
         trigram_index[trigram].append(word)
 
@@ -70,14 +72,16 @@ def insert(word):
 
 # replace word from old to new
 def update(old_word, new_word):
+    old_word = ''.join(filter(str.isalpha, old_word)).lower()
+    new_word = ''.join(filter(str.isalpha, new_word)).lower()
     # Remove old spelling from the trigram index
-    trigrams_old = [''.join(gram) for gram in ngrams(old_word, 3)]
+    trigrams_old = [''.join(gram) for gram in ngrams(old_word, 2)]
     for trigram in trigrams_old:
         if old_word in trigram_index[trigram]:
             trigram_index[trigram].remove(old_word)
 
     # Add new spelling to the trigram index
-    trigrams_new = [''.join(gram) for gram in ngrams(new_word, 3)]
+    trigrams_new = [''.join(gram) for gram in ngrams(new_word, 2)]
     for trigram in trigrams_new:
         trigram_index[trigram].append(new_word)
 
@@ -86,8 +90,9 @@ def update(old_word, new_word):
 
 # delete a word
 def delete(word):
+    word = ''.join(filter(str.isalpha, word)).lower()
     # Remove old spelling from the trigram index
-    trigrams_old = [''.join(gram) for gram in ngrams(word, 3)]
+    trigrams_old = [''.join(gram) for gram in ngrams(word, 2)]
     for trigram in trigrams_old:
         if word in trigram_index[trigram]:
             trigram_index[trigram].remove(word)
